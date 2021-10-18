@@ -1,0 +1,1 @@
+Projekt na przedmiot "Przetwarzanie danych w chmurach obliczeniowych". WFiIS AGH 2021/2022
