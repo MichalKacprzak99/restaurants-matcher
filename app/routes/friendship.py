@@ -1,10 +1,9 @@
 from typing import List
 
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import JSONResponse
 from neo4j import Result
 from neo4j.exceptions import ServiceUnavailable
-from fastapi.responses import JSONResponse
-
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED
 
 from app.models.person import Person

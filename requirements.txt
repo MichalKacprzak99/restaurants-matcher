@@ -1,4 +1,4 @@
-neo4j
 fastapi
-uvicorn
 python-dotenv
+neo4j
+uvicorn
