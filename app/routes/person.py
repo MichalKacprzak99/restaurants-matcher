@@ -8,7 +8,9 @@ from starlette.status import HTTP_200_OK, HTTP_201_CREATED
 from app.db.driver import Driver
 from app.models import Person
 
-router = APIRouter(prefix='/person', tags=["person"])
+router = APIRouter(prefix='/person',
+                   tags=["person"],
+                   )
 
 
 @router.get(
