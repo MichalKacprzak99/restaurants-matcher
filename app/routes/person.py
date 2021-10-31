@@ -8,13 +8,12 @@ from starlette.status import HTTP_200_OK, HTTP_201_CREATED
 from app.models.person import Person
 from app.db.driver import Driver
 
-router = APIRouter()
+router = APIRouter(prefix='/person', tags=["person"])
 
 
 @router.get(
-    "/person/person_name={person_name}",
+    "/person_name={person_name}",
     status_code=HTTP_200_OK,
-    tags=["person"],
 )
 async def get_person(person_name: str) -> Person:
     with Driver.session() as session:
@@ -26,9 +25,8 @@ async def get_person(person_name: str) -> Person:
 
 
 @router.get(
-    "/person",
+    "/",
     status_code=HTTP_200_OK,
-    tags=["person"],
 )
 async def get_all_person() -> List[Person]:
     with Driver.session() as session:
@@ -37,9 +35,8 @@ async def get_all_person() -> List[Person]:
 
 
 @router.post(
-    "/person",
+    "/",
     status_code=HTTP_201_CREATED,
-    tags=["person"],
 )
 async def create_person(person: Person = Body(..., embed=True)) -> Person:
     with Driver.session() as session:
@@ -50,13 +47,22 @@ async def create_person(person: Person = Body(..., embed=True)) -> Person:
 
 
 @router.delete(
-    "/person",
+    "/",
     status_code=HTTP_200_OK,
-    tags=["person"],
 )
 async def delete_person(person_name: str):
     with Driver.session() as session:
         session.write_transaction(_delete_person, person_name)
+
+
+@router.get(
+    "/friends",
+    status_code=HTTP_200_OK,
+)
+async def get_person_friends(person_name: str) -> List[Person]:
+    with Driver.session() as session:
+        result: List[Person] = session.read_transaction(_get_user_friends, person_name)
+    return result
 
 
 def _delete_person(tx, person_name: str):
@@ -102,5 +108,17 @@ def _create_and_return_person(tx, person: Person) -> Person:
     result: Result = tx.run(query, **person.dict())
     try:
         return Person(**result.single()['p'])
+    except ServiceUnavailable as exception:
+        raise exception
+
+
+def _get_user_friends(tx, person_name: str) -> List[Person]:
+    query = (
+        "MATCH (:Person {name: 'string'})--(p:Person) "
+        "RETURN p"
+    )
+    result: Result = tx.run(query, person_name=person_name)
+    try:
+        return [Person(**person.data()['p']) for person in result]
     except ServiceUnavailable as exception:
         raise exception
