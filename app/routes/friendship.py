@@ -29,7 +29,7 @@ async def check_friendships(person_name: str, friend_name: str):
 )
 async def create_friendship(friendship: Friendship):
     with Driver.session() as session:
-        if not all(list(map(lambda person: session.read_transaction(_find_and_return_person, person.name),
+        if not all(list(map(lambda person: session.read_transaction(_find_and_return_person, person),
                             friendship.members))):
             raise HTTPException(status_code=404, detail="Cannot create friendship - wrong person names")
 
@@ -51,7 +51,7 @@ def _create_friendship(tx, friendship: Friendship):
         "MATCH (p2: Person {name: $friend_name}) "
         "CREATE (p1)-[rel: IS_FRIENDS_WITH]->(p2)"
     )
-    tx.run(query, person_name=friendship.members[0].name, friend_name=friendship.members[1].name)
+    tx.run(query, person_name=friendship.members[0], friend_name=friendship.members[1])
 
 
 def _check_friendships(tx, person_name: str, friend_name: str) -> bool:

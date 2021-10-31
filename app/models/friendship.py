@@ -6,4 +6,4 @@ from app.models import Person
 
 
 class Friendship(APIModel):
-    members: List[Person]
+    members: List[str]
