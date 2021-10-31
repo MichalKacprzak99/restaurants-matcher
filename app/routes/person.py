@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import APIRouter, HTTPException
 from neo4j import Result
 from neo4j.exceptions import ServiceUnavailable
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED
@@ -38,7 +38,7 @@ async def get_all_person() -> List[Person]:
     "/",
     status_code=HTTP_201_CREATED,
 )
-async def create_person(person: Person = Body(..., embed=True)) -> Person:
+async def create_person(person: Person) -> Person:
     with Driver.session() as session:
         if session.read_transaction(_find_and_return_person, person.name):
             raise HTTPException(status_code=404, detail="Person exist")

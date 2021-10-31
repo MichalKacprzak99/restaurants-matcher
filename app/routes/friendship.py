@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from neo4j import Result
 from neo4j.exceptions import ServiceUnavailable
@@ -27,7 +27,7 @@ async def check_friendships(person_name: str, friend_name: str):
     "/",
     status_code=HTTP_201_CREATED,
 )
-async def create_friendship(friendship: Friendship = Body(..., embed=True)):
+async def create_friendship(friendship: Friendship):
     with Driver.session() as session:
         if not all(list(map(lambda person: session.read_transaction(_find_and_return_person, person.name),
                             friendship.members))):
