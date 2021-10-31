@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from neo4j import Result
 from neo4j.exceptions import ServiceUnavailable
 from starlette.status import HTTP_200_OK
@@ -11,6 +11,19 @@ from app.db.driver import Driver
 router = APIRouter(prefix='/cuisine',
                    tags=['cuisine'],
                    )
+
+
+@router.get(
+    "/cuisine_name={cuisine_name}",
+    status_code=HTTP_200_OK,
+)
+async def get_cuisine(person_name: str) -> Cuisine:
+    with Driver.session() as session:
+        result: Cuisine = session.read_transaction(_find_and_return_cuisine, person_name)
+        if not result:
+            raise HTTPException(status_code=404, detail="Not found")
+
+    return result
 
 
 @router.get(
@@ -50,7 +63,7 @@ def _create_and_return_cuisine(tx, cuisine: Cuisine) -> Cuisine:
     )
     result: Result = tx.run(query, **cuisine.dict())
     try:
-        return Cuisine(**result.single()['p'])
+        return Cuisine(**result.single()['c'])
     except ServiceUnavailable as exception:
         raise exception
 
@@ -73,3 +86,18 @@ def _delete_cuisine(tx, cuisine_name: str):
         "DELETE c"
     )
     tx.run(query, cuisine_name=cuisine_name)
+
+
+def _find_and_return_cuisine(tx, cuisine_name: str) -> Cuisine:
+    query = (
+        "MATCH (c:Cuisine) "
+        "WHERE c.name = $cuisine_name "
+        "RETURN c"
+    )
+    result: Result = tx.run(query, cuisine_name=cuisine_name)
+    try:
+        cuisine_data = result.single()
+        if cuisine_data:
+            return Cuisine(**cuisine_data['c'])
+    except ServiceUnavailable as exception:
+        raise exception
