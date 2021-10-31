@@ -30,9 +30,9 @@ async def get_person(person_name: str) -> Person:
     "/",
     status_code=HTTP_200_OK,
 )
-async def get_all_person() -> List[Person]:
+async def get_all_persons() -> List[Person]:
     with Driver.session() as session:
-        result: List[Person] = session.read_transaction(_return_all_person)
+        result: List[Person] = session.read_transaction(_return_all_persons)
     return result
 
 
@@ -42,8 +42,6 @@ async def get_all_person() -> List[Person]:
 )
 async def create_person(person: Person) -> Person:
     with Driver.session() as session:
-        if session.read_transaction(_find_and_return_person, person.name):
-            raise HTTPException(status_code=404, detail="Person exist")
         result: Person = session.write_transaction(_create_and_return_person, person)
     return result
 
@@ -90,7 +88,7 @@ def _find_and_return_person(tx, person_name: str) -> Person:
         raise exception
 
 
-def _return_all_person(tx) -> List[Person]:
+def _return_all_persons(tx) -> List[Person]:
     query = (
         "MATCH (p:Person) "
         "RETURN p"
@@ -116,7 +114,7 @@ def _create_and_return_person(tx, person: Person) -> Person:
 
 def _get_user_friends(tx, person_name: str) -> List[Person]:
     query = (
-        "MATCH (:Person {name: 'string'})--(p:Person) "
+        "MATCH (:Person {name: $person_name})--(p:Person) "
         "RETURN p"
     )
     result: Result = tx.run(query, person_name=person_name)
