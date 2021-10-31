@@ -1,11 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Body, HTTPException
 from fastapi.responses import JSONResponse
 from neo4j import Result
 from neo4j.exceptions import ServiceUnavailable
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED
 
-
 from app.db.driver import Driver
+from app.models import Friendship
 from app.routes.person import _find_and_return_person
 
 router = APIRouter(prefix='/friendship',
@@ -27,17 +27,13 @@ async def check_friendships(person_name: str, friend_name: str):
     "/",
     status_code=HTTP_201_CREATED,
 )
-async def create_friendship(person_name: str, friend_name: str):
+async def create_friendship(friendship: Friendship = Body(..., embed=True)):
     with Driver.session() as session:
-        validate_person_names = [
-            session.read_transaction(_find_and_return_person, person_name),
-            session.read_transaction(_find_and_return_person, friend_name)
-        ]
-
-        if not all(validate_person_names):
+        if not all(list(map(lambda person: session.read_transaction(_find_and_return_person, person.name),
+                            friendship.members))):
             raise HTTPException(status_code=404, detail="Cannot create friendship - wrong person names")
 
-        session.write_transaction(_create_friendship, person_name, friend_name)
+        session.write_transaction(_create_friendship, friendship)
 
 
 @router.delete(
@@ -49,13 +45,13 @@ async def delete_friendship(person_name: str, friend_name: str):
         session.write_transaction(_delete_friendship, person_name, friend_name)
 
 
-def _create_friendship(tx, person_name: str, friend_name: str):
+def _create_friendship(tx, friendship: Friendship):
     query = (
         "MATCH (p1:Person {name: $person_name}) "
         "MATCH (p2: Person {name: $friend_name}) "
         "CREATE (p1)-[rel: IS_FRIENDS_WITH]->(p2)"
     )
-    tx.run(query, person_name=person_name, friend_name=friend_name)
+    tx.run(query, person_name=friendship.members[0].name, friend_name=friendship.members[1].name)
 
 
 def _check_friendships(tx, person_name: str, friend_name: str) -> bool:
