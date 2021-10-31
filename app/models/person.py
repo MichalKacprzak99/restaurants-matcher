@@ -1,7 +1,7 @@
-from pydantic import BaseModel
+from fastapi_utils.api_model import APIModel
 
 
-class Person(BaseModel):
+class Person(APIModel):
     name: str
     phone: str
     city: str

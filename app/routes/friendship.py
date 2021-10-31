@@ -1,33 +1,21 @@
-from typing import List
-
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from neo4j import Result
 from neo4j.exceptions import ServiceUnavailable
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED
 
-from app.models.person import Person
+
 from app.db.driver import Driver
 from app.routes.person import _find_and_return_person
 
-router = APIRouter()
+router = APIRouter(prefix='/friendship',
+                   tags=["friendship"],
+                   )
 
 
 @router.get(
-    "/friendship",
-    status_code=HTTP_200_OK,
-    tags=["friendship"],
-)
-async def get_person_friends(person_name: str) -> List[Person]:
-    with Driver.session() as session:
-        result: List[Person] = session.read_transaction(_get_user_friends, person_name)
-    return result
-
-
-@router.get(
-    "/friendship/check-friendship",
-    status_code=HTTP_200_OK,
-    tags=["friendship"],
+    "/check-friendship",
+    status_code=HTTP_200_OK
 )
 async def check_friendships(person_name: str, friend_name: str):
     with Driver.session() as session:
@@ -36,9 +24,8 @@ async def check_friendships(person_name: str, friend_name: str):
 
 
 @router.post(
-    "/friendship",
+    "/",
     status_code=HTTP_201_CREATED,
-    tags=["friendship"],
 )
 async def create_friendship(person_name: str, friend_name: str):
     with Driver.session() as session:
@@ -54,9 +41,8 @@ async def create_friendship(person_name: str, friend_name: str):
 
 
 @router.delete(
-    "/friendship",
+    "/",
     status_code=HTTP_200_OK,
-    tags=["friendship"],
 )
 async def delete_friendship(person_name: str, friend_name: str):
     with Driver.session() as session:
@@ -70,18 +56,6 @@ def _create_friendship(tx, person_name: str, friend_name: str):
         "CREATE (p1)-[rel: IS_FRIENDS_WITH]->(p2)"
     )
     tx.run(query, person_name=person_name, friend_name=friend_name)
-
-
-def _get_user_friends(tx, person_name: str) -> List[Person]:
-    query = (
-        "MATCH (:Person {name: 'string'})--(p:Person) "
-        "RETURN p"
-    )
-    result: Result = tx.run(query, person_name=person_name)
-    try:
-        return [Person(**person.data()['p']) for person in result]
-    except ServiceUnavailable as exception:
-        raise exception
 
 
 def _check_friendships(tx, person_name: str, friend_name: str) -> bool:
