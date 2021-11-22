@@ -52,6 +52,7 @@ def _check_friendships(tx, person_name: str, friend_name: str) -> bool:
 def _delete_friendship(tx, person_name: str, friend_name: str):
     query = (
         "MATCH (p1:Person {name: $person_name})-[rel:IS_FRIENDS_WITH]-(p2:Person {name: $friend_name})"
+        "DETACH "
         "DELETE rel"
     )
     tx.run(query, person_name=person_name, friend_name=friend_name)

@@ -66,6 +66,7 @@ def _return_all_cuisines(tx) -> List[Cuisine]:
 def _delete_cuisine(tx, cuisine_name: str):
     query = (
         "MATCH (c:Cuisine {name: $cuisine_name}) "
+        "DETACH "
         "DELETE c"
     )
     tx.run(query, cuisine_name=cuisine_name)

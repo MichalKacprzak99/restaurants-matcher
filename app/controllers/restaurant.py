@@ -4,7 +4,6 @@ from fastapi import HTTPException
 from neo4j import Result
 from neo4j.exceptions import ServiceUnavailable
 
-
 from app.db.driver import Driver
 from app.schemas import Restaurant
 
@@ -38,6 +37,7 @@ def delete_restaurant(restaurant_name: str):
 def _delete_restaurant(tx, restaurant_name: str):
     query = (
         "MATCH (r:Restaurant {name: $restaurant_name}) "
+        "DETACH "
         "DELETE r"
     )
     tx.run(query, restaurant_name=restaurant_name)
@@ -65,7 +65,7 @@ def _return_all_restaurants(tx) -> List[Restaurant]:
     )
     result: Result = tx.run(query)
     try:
-        return [Restaurant(**person.data()['p']) for person in result]
+        return [Restaurant(**person.data()['r']) for person in result]
     except ServiceUnavailable as exception:
         raise exception
 
@@ -79,13 +79,10 @@ def _create_and_return_restaurant(tx, restaurant: Restaurant) -> Restaurant:
         "CREATE (r)-[rel2: SERVE_CUISINE]->(c)"
         "RETURN r"
     )
-    result: Result = tx.run(query, restaurant_name=restaurant.name,
-                            owner_name=restaurant.owner.name,
-                            cuisine_name=restaurant.cuisine.name)
+    tx.run(query, restaurant_name=restaurant.name,
+           owner_name=restaurant.owner.name,
+           cuisine_name=restaurant.cuisine.name)
     try:
-        return Restaurant(**result.single()['p'])
+        return restaurant
     except ServiceUnavailable as exception:
         raise exception
-
-
-

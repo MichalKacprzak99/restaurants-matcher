@@ -44,6 +44,7 @@ def get_person_friends(person_name: str) -> List[Person]:
 def _delete_person(tx, person_name: str):
     query = (
         "MATCH (p:Person {name: $person_name}) "
+        "DETACH "
         "DELETE p"
     )
     tx.run(query, person_name=person_name)
@@ -81,9 +82,9 @@ def _create_and_return_person(tx, person: Person) -> Person:
         "CREATE (p:Person {name:$name, city:$city, phone:$phone}) ",
         "RETURN p"
     )
-    result: Result = tx.run(query, **person.dict())
+    tx.run(query, **person.dict())
     try:
-        return Person(**result.single()['p'])
+        return person
     except ServiceUnavailable as exception:
         raise exception
 
