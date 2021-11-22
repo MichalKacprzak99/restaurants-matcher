@@ -38,7 +38,7 @@ def _create_friendship(tx, friendship: Friendship):
 
 def _check_friendships(tx, person_name: str, friend_name: str) -> bool:
     query = (
-        "MATCH (p1:Person {name: $person_name})-[rel:FRIENDS_WITH]-(p2:Person {name: $friend_name})"
+        "MATCH (p1:Person {name: $person_name})-[rel:FRIEND_WITH]-(p2:Person {name: $friend_name})"
         "RETURN CASE rel WHEN NULL THEN false ELSE true END as are_friends"
     )
 
@@ -51,7 +51,7 @@ def _check_friendships(tx, person_name: str, friend_name: str) -> bool:
 
 def _delete_friendship(tx, person_name: str, friend_name: str):
     query = (
-        "MATCH (p1:Person {name: $person_name})-[rel:FRIENDS_WITH]-(p2:Person {name: $friend_name})"
+        "MATCH (p1:Person {name: $person_name})-[rel:FRIEND_WITH]-(p2:Person {name: $friend_name})"
         "DETACH "
         "DELETE rel"
     )
