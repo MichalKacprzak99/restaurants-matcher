@@ -5,7 +5,7 @@ from neo4j import Result
 from neo4j.exceptions import ServiceUnavailable
 from starlette.status import HTTP_200_OK
 
-from app.models.cuisine import Cuisine
+from app.schemas.cuisine import Cuisine
 from app.db.driver import Driver
 
 router = APIRouter(prefix='/cuisine',

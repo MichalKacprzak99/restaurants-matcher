@@ -6,7 +6,7 @@ from neo4j.exceptions import ServiceUnavailable
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED
 
 from app.db.driver import Driver
-from app.models import Person
+from app.schemas import Person
 
 router = APIRouter(prefix='/person',
                    tags=["person"],

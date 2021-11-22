@@ -2,8 +2,8 @@ from typing import Optional
 
 from fastapi_utils.api_model import APIModel
 
-from app.models.cuisine import Cuisine
-from app.models.person import Person
+from app.schemas.cuisine import Cuisine
+from app.schemas.person import Person
 
 
 # TODO temporary optional
