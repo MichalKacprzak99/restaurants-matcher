@@ -8,6 +8,6 @@ from app.schemas.person import Person
 
 # TODO temporary optional
 class Restaurant(APIModel):
-    cuisine: Optional[Cuisine]
     name: str
     owner: Optional[Person]
+    cuisine: Optional[Cuisine]
