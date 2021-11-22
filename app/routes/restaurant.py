@@ -1,7 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter
-from starlette.status import HTTP_200_OK, HTTP_201_CREATED
+from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 import app.controllers.restaurant as controller
 from app.schemas import Restaurant
@@ -37,7 +37,7 @@ async def create_restaurant(restaurant: Restaurant) -> Restaurant:
 
 @router.delete(
     "/",
-    status_code=HTTP_200_OK,
+    status_code=HTTP_204_NO_CONTENT,
 )
 async def delete_restaurant(restaurant_name: str):
     controller.delete_restaurant(restaurant_name=restaurant_name)

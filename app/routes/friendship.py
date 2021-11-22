@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from starlette.status import HTTP_200_OK, HTTP_201_CREATED
+from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 import app.controllers.friendship as controller
 from app.schemas import Friendship
@@ -30,7 +30,7 @@ async def create_friendship(friendship: Friendship):
 
 @router.delete(
     "/",
-    status_code=HTTP_200_OK,
+    status_code=HTTP_204_NO_CONTENT,
 )
 async def delete_friendship(person_name: str, friend_name: str):
     controller.delete_friendship(person_name=person_name, friend_name=friend_name)
