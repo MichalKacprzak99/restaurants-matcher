@@ -4,7 +4,6 @@ from fastapi import HTTPException
 from neo4j import Result
 from neo4j.exceptions import ServiceUnavailable
 
-
 from app.db.driver import Driver
 from app.schemas import Person
 
@@ -43,18 +42,22 @@ def get_person_friends(person_name: str) -> List[Person]:
 
 def _delete_person(tx, person_name: str):
     query = (
-        "MATCH (p:Person {name: $person_name}) "
-        "DETACH "
-        "DELETE p"
+        '''
+        MATCH (p:Person {name: $person_name})
+        DETACH
+        DELETE p
+        '''
     )
     tx.run(query, person_name=person_name)
 
 
 def _find_and_return_person(tx, person_name: str) -> Person:
     query = (
-        "MATCH (p:Person) "
-        "WHERE p.name = $person_name "
-        "RETURN p"
+        '''
+        MATCH (p:Person)
+        WHERE p.name = $person_name
+        RETURN p
+        '''
     )
     result: Result = tx.run(query, person_name=person_name)
     try:
@@ -67,8 +70,10 @@ def _find_and_return_person(tx, person_name: str) -> Person:
 
 def _return_all_persons(tx) -> List[Person]:
     query = (
-        "MATCH (p:Person) "
-        "RETURN p"
+        '''
+        MATCH (p:Person)
+        RETURN p
+        '''
     )
     result: Result = tx.run(query)
     try:
@@ -79,8 +84,9 @@ def _return_all_persons(tx) -> List[Person]:
 
 def _create_and_return_person(tx, person: Person) -> Person:
     query = (
-        "CREATE (p:Person {name:$name, city:$city, phone:$phone}) "
-        "RETURN p"
+        '''
+        CREATE (p:Person {name:$name, city:$city, phone:$phone})
+        '''
     )
     tx.run(query, **person.dict())
     try:
@@ -91,11 +97,13 @@ def _create_and_return_person(tx, person: Person) -> Person:
 
 def _get_user_friends(tx, person_name: str) -> List[Person]:
     query = (
-        "MATCH (:Person {name: $person_name})--(p:Person) "
-        "RETURN p"
+        '''
+        MATCH (:Person {name: $person_name})--(friend:Person)
+        RETURN friend
+        '''
     )
     result: Result = tx.run(query, person_name=person_name)
     try:
-        return [Person(**person.data()['p']) for person in result]
+        return [Person(**person.data()['friend']) for person in result]
     except ServiceUnavailable as exception:
         raise exception

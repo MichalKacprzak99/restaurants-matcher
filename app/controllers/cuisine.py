@@ -41,8 +41,10 @@ def delete_cuisine(cuisine_name: str):
 
 def _create_and_return_cuisine(tx, cuisine: Cuisine) -> Cuisine:
     query = (
-        "CREATE (c:Cuisine {name:$name) ",
-        "RETURN c"
+        '''
+        CREATE (c:Cuisine {name:$name)
+        RETURN c
+        '''
     )
     result: Result = tx.run(query, **cuisine.dict())
     try:
@@ -53,8 +55,10 @@ def _create_and_return_cuisine(tx, cuisine: Cuisine) -> Cuisine:
 
 def _return_all_cuisines(tx) -> List[Cuisine]:
     query = (
-        "MATCH (c:Cuisine) "
-        "RETURN c"
+        '''
+        MATCH (c:Cuisine)
+        RETURN c
+        '''
     )
     result: Result = tx.run(query)
     try:
@@ -65,18 +69,22 @@ def _return_all_cuisines(tx) -> List[Cuisine]:
 
 def _delete_cuisine(tx, cuisine_name: str):
     query = (
-        "MATCH (c:Cuisine {name: $cuisine_name}) "
-        "DETACH "
-        "DELETE c"
+        '''
+        MATCH (c:Cuisine {name: $cuisine_name})
+        DETACH
+        DELETE c
+        '''
     )
     tx.run(query, cuisine_name=cuisine_name)
 
 
 def _find_and_return_cuisine(tx, cuisine_name: str) -> Cuisine:
     query = (
-        "MATCH (c:Cuisine) "
-        "WHERE c.name = $cuisine_name "
-        "RETURN c"
+        '''
+        MATCH (c:Cuisine)
+        WHERE c.name = $cuisine_name
+        RETURN c
+        '''
     )
     result: Result = tx.run(query, cuisine_name=cuisine_name)
     try:

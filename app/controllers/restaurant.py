@@ -36,20 +36,24 @@ def delete_restaurant(restaurant_name: str):
 
 def _delete_restaurant(tx, restaurant_name: str):
     query = (
-        "MATCH (r:Restaurant {name: $restaurant_name}) "
-        "DETACH "
-        "DELETE r"
+        '''
+        MATCH (r:Restaurant {name: $restaurant_name})
+        DETACH
+        DELETE r
+        '''
     )
     tx.run(query, restaurant_name=restaurant_name)
 
 
 def _find_and_return_restaurant(tx, restaurant_name: str) -> Restaurant:
     query = (
-        "MATCH"
-        "(restaurant)-[:CUISINE]->(cuisine),"
-        "(owner:Person)-[:OWNER]->(restaurant) "
-        "WHERE restaurant.name = $restaurant_name "
-        "RETURN restaurant, owner, cuisine"
+        '''
+        MATCH
+        (restaurant)-[:CUISINE]->(cuisine),
+        (owner:Person)-[:OWNER]->(restaurant)
+        WHERE restaurant.name = $restaurant_name
+        RETURN restaurant, owner, cuisine
+        '''
     )
     result: Result = tx.run(query, restaurant_name=restaurant_name)
     try:
@@ -64,11 +68,12 @@ def _find_and_return_restaurant(tx, restaurant_name: str) -> Restaurant:
 
 def _return_all_restaurants(tx) -> List[Restaurant]:
     query = (
-        'MATCH'
-        '(restaurant)-[:CUISINE]->(cuisine),'
-        '(owner:Person)-[:OWNER]->(restaurant)'
-
-        'RETURN restaurant, owner, cuisine'
+        '''
+        MATCH
+        (restaurant)-[:CUISINE]->(cuisine),
+        (owner:Person)-[:OWNER]->(restaurant)
+        RETURN restaurant, owner, cuisine
+        '''
     )
     result: Result = tx.run(query)
     try:
@@ -85,11 +90,13 @@ def _return_all_restaurants(tx) -> List[Restaurant]:
 
 def _create_and_return_restaurant(tx, restaurant: Restaurant) -> Restaurant:
     query = (
-        "MATCH (p:Person {name: $owner_name}) "
-        "MATCH (c:Cuisine {name: $cuisine_name}) "
-        "CREATE (r:Restaurant {name:$restaurant_name}) "
-        "CREATE (p)-[rel1: OWNER_OF]->(r)"
-        "CREATE (r)-[rel2: SERVE_CUISINE]->(c)"
+        '''
+        MATCH (p:Person {name: $owner_name})
+        MATCH (c:Cuisine {name: $cuisine_name})
+        CREATE (r:Restaurant {name:$restaurant_name})
+        CREATE (p)-[rel1: OWNER_OF]->(r)
+        CREATE (r)-[rel2: SERVE_CUISINE]->(c)
+        '''
     )
     tx.run(query, restaurant_name=restaurant.name,
            owner_name=restaurant.owner.name,
