@@ -4,7 +4,7 @@ from typing import List
 from pydantic import BaseSettings
 
 
-class Settings(BaseSettings):
+class Configuration(BaseSettings):
     URI: str = ''
     DB_USER: str = ''
     DB_PASSWORD: str = ''
@@ -18,5 +18,5 @@ class Settings(BaseSettings):
 
 
 @lru_cache()
-def get_settings():
-    return Settings()
+def get_configuration():
+    return Configuration()

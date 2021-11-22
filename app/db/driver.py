@@ -1,6 +1,6 @@
 from neo4j import GraphDatabase
 
-from app.core.config import get_settings
+from app.core.config import get_configuration
 
-settings = get_settings()
-Driver = GraphDatabase.driver(settings.URI, auth=(settings.DB_USER, settings.DB_PASSWORD))
+configuration = get_configuration()
+Driver = GraphDatabase.driver(configuration.URI, auth=(configuration.DB_USER, configuration.DB_PASSWORD))
