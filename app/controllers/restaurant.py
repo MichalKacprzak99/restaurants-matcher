@@ -70,13 +70,18 @@ def _return_all_restaurants(tx) -> List[Restaurant]:
         raise exception
 
 
-# TODO full creation - relation with owner + cuisine
 def _create_and_return_restaurant(tx, restaurant: Restaurant) -> Restaurant:
     query = (
-        "CREATE (r:Restaurant {name:$restaurant_name}) ",
+        "MATCH (p:Person {name: $owner_name}) "
+        "MATCH (c:Cuisine {name: $cuisine_name}) "
+        "CREATE (r:Restaurant {name:$restaurant_name}) "
+        "CREATE (p)-[rel1: OWNER_OF]->(r)"
+        "CREATE (r)-[rel2: SERVE_CUISINE]->(c)"
         "RETURN r"
     )
-    result: Result = tx.run(query, restaurant_name=restaurant.name)
+    result: Result = tx.run(query, restaurant_name=restaurant.name,
+                            owner_name=restaurant.owner.name,
+                            cuisine_name=restaurant.cuisine.name)
     try:
         return Restaurant(**result.single()['p'])
     except ServiceUnavailable as exception:
