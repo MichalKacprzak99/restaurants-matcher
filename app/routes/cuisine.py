@@ -15,8 +15,8 @@ router = APIRouter(prefix='/cuisine',
     "/cuisine_name={cuisine_name}",
     status_code=HTTP_200_OK,
 )
-async def get_cuisine(person_name: str) -> Cuisine:
-    return controller.get_cuisine(person_name=person_name)
+async def get_cuisine(cuisine_name: str) -> Cuisine:
+    return controller.get_cuisine(cuisine_name=cuisine_name)
 
 
 @router.get(

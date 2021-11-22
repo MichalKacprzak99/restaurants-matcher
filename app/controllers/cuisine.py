@@ -13,9 +13,9 @@ router = APIRouter(prefix='/cuisine',
                    )
 
 
-def get_cuisine(person_name: str) -> Cuisine:
+def get_cuisine(cuisine_name: str) -> Cuisine:
     with Driver.session() as session:
-        result: Cuisine = session.read_transaction(_find_and_return_cuisine, person_name)
+        result: Cuisine = session.read_transaction(_find_and_return_cuisine, cuisine_name)
         if not result:
             raise HTTPException(status_code=404, detail="Not found")
 
