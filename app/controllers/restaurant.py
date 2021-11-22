@@ -45,27 +45,40 @@ def _delete_restaurant(tx, restaurant_name: str):
 
 def _find_and_return_restaurant(tx, restaurant_name: str) -> Restaurant:
     query = (
-        "MATCH (r:Restaurant) "
-        "WHERE r.name = $restaurant_name "
-        "RETURN r"
+        "MATCH"
+        "(restaurant)-[:CUISINE]->(cuisine),"
+        "(owner:Person)-[:OWNER]->(restaurant) "
+        "WHERE restaurant.name = $restaurant_name "
+        "RETURN restaurant, owner, cuisine"
     )
     result: Result = tx.run(query, restaurant_name=restaurant_name)
     try:
-        restaurant_data = result.single()
-        if restaurant_data:
-            return Restaurant(**restaurant_data['r'])
+        restaurant = result.single()
+        if restaurant:
+            restaurant_data: dict = restaurant.data()
+            name = restaurant_data.pop('restaurant').get('name')
+            return Restaurant(name=name, **restaurant_data)
     except ServiceUnavailable as exception:
         raise exception
 
 
 def _return_all_restaurants(tx) -> List[Restaurant]:
     query = (
-        "MATCH (r:Restaurant) "
-        "RETURN r"
+        'MATCH'
+        '(restaurant)-[:CUISINE]->(cuisine),'
+        '(owner:Person)-[:OWNER]->(restaurant)'
+
+        'RETURN restaurant, owner, cuisine'
     )
     result: Result = tx.run(query)
     try:
-        return [Restaurant(**person.data()['r']) for person in result]
+        restaurants: List[Restaurant] = []
+        for restaurant in result:
+            restaurant_data: dict = restaurant.data()
+            name = restaurant_data.pop('restaurant').get('name')
+            restaurants.append(Restaurant(name=name, **restaurant_data))
+
+        return restaurants
     except ServiceUnavailable as exception:
         raise exception
 
@@ -77,7 +90,6 @@ def _create_and_return_restaurant(tx, restaurant: Restaurant) -> Restaurant:
         "CREATE (r:Restaurant {name:$restaurant_name}) "
         "CREATE (p)-[rel1: OWNER_OF]->(r)"
         "CREATE (r)-[rel2: SERVE_CUISINE]->(c)"
-        "RETURN r"
     )
     tx.run(query, restaurant_name=restaurant.name,
            owner_name=restaurant.owner.name,
