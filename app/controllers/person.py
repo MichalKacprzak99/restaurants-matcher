@@ -78,7 +78,7 @@ def _return_all_persons(tx) -> List[Person]:
 
 def _create_and_return_person(tx, person: Person) -> Person:
     query = (
-        "CREATE (p:Person {name:$name , city:$city, phone:$phone}) ",
+        "CREATE (p:Person {name:$name, city:$city, phone:$phone}) ",
         "RETURN p"
     )
     result: Result = tx.run(query, **person.dict())

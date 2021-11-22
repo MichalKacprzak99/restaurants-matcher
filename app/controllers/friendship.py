@@ -31,7 +31,7 @@ def _create_friendship(tx, friendship: Friendship):
     query = (
         "MATCH (p1:Person {name: $person_name}) "
         "MATCH (p2: Person {name: $friend_name}) "
-        "CREATE (p1)-[rel: IS_FRIENDS_WITH]->(p2)"
+        "CREATE (p1)-[rel: FRIEND_WITH]->(p2)"
     )
     tx.run(query, person_name=friendship.members[0], friend_name=friendship.members[1])
 
