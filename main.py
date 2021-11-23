@@ -26,3 +26,8 @@ async def clear_config_caches():
 
 
 app.include_router(router, prefix=configuration.API_PREFIX)
+
+
+@app.get("/")
+def test():
+    return {"status": "test"}
