@@ -10,15 +10,6 @@ router = APIRouter(prefix='/restaurant',
                    tags=['restaurant'],
                    )
 
-
-@router.get(
-    "/restaurant_name={restaurant_name}",
-    status_code=HTTP_200_OK,
-)
-async def get_restaurant(restaurant_name: str) -> Restaurant:
-    return controller.get_restaurant(restaurant_name=restaurant_name)
-
-
 @router.get(
     "/",
     status_code=HTTP_200_OK,

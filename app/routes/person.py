@@ -13,14 +13,6 @@ router = APIRouter(prefix='/person',
 
 
 @router.get(
-    "/person_name={person_name}",
-    status_code=HTTP_200_OK,
-)
-async def get_person(person_name: str) -> Person:
-    return controller.get_person(person_name=person_name)
-
-
-@router.get(
     "/",
     status_code=HTTP_200_OK,
 )
