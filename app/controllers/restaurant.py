@@ -70,8 +70,7 @@ def _return_all_restaurants(tx) -> List[Restaurant]:
     query = (
         '''
         MATCH
-        (restaurant)-[:CUISINE]->(cuisine),
-        (owner:Person)-[:OWNER]->(restaurant)
+        (owner:Person)-[:OWNER_OF]->(restaurant:Restaurant)-[:SERVE_CUISINE]->(cuisine:Cuisine)
         RETURN restaurant, owner, cuisine
         '''
     )
