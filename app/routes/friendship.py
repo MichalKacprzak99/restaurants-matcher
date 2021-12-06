@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
+from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 import app.controllers.friendship as controller
 from app.schemas import Friendship
@@ -12,7 +12,7 @@ router = APIRouter(prefix='/friendship',
 
 @router.get(
     "/",
-    status_code=HTTP_201_CREATED,
+    status_code=HTTP_200_OK,
 )
 async def get_all_friendships():
     return controller.get_friendships()
