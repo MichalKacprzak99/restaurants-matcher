@@ -33,7 +33,7 @@ def delete_cuisine(cuisine_name: str):
 def _create_and_return_cuisine(tx, cuisine: Cuisine) -> Cuisine:
     query = (
         '''
-        CREATE (c:Cuisine {name:$name)
+        CREATE (c:Cuisine {name:$name})
         RETURN c
         '''
     )
