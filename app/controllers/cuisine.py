@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from neo4j import Result
 from neo4j.exceptions import ServiceUnavailable
 
@@ -11,15 +11,6 @@ from app.db.driver import Driver
 router = APIRouter(prefix='/cuisine',
                    tags=['cuisine'],
                    )
-
-
-def get_cuisine(cuisine_name: str) -> Cuisine:
-    with Driver.session() as session:
-        result: Cuisine = session.read_transaction(_find_and_return_cuisine, cuisine_name)
-        if not result:
-            raise HTTPException(status_code=404, detail="Not found")
-
-    return result
 
 
 def get_all_cuisines() -> List[Cuisine]:
@@ -76,20 +67,3 @@ def _delete_cuisine(tx, cuisine_name: str):
         '''
     )
     tx.run(query, cuisine_name=cuisine_name)
-
-
-def _find_and_return_cuisine(tx, cuisine_name: str) -> Cuisine:
-    query = (
-        '''
-        MATCH (c:Cuisine)
-        WHERE c.name = $cuisine_name
-        RETURN c
-        '''
-    )
-    result: Result = tx.run(query, cuisine_name=cuisine_name)
-    try:
-        cuisine_data = result.single()
-        if cuisine_data:
-            return Cuisine(**cuisine_data['c'])
-    except ServiceUnavailable as exception:
-        raise exception

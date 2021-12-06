@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import HTTPException
 from neo4j import Result
 from neo4j.exceptions import ServiceUnavailable
@@ -5,6 +7,12 @@ from neo4j.exceptions import ServiceUnavailable
 from app.controllers.person import _find_and_return_person
 from app.db.driver import Driver
 from app.schemas import Friendship
+
+
+def get_friendships():
+    with Driver.session() as session:
+        result: List[Friendship] = session.read_transaction(_return_all_friendships)
+    return result
 
 
 def check_friendships(person_name: str, friend_name: str):
@@ -25,6 +33,21 @@ def create_friendship(friendship: Friendship):
 def delete_friendship(person_name: str, friend_name: str):
     with Driver.session() as session:
         session.write_transaction(_delete_friendship, person_name, friend_name)
+
+
+def _return_all_friendships(tx) -> List[Friendship]:
+    query = (
+        '''
+        MATCH 
+        (p1:Person)-[r:FRIEND_WITH]->(p2:Person) 
+        RETURN [p1.name, p2.name] as friendship
+        '''
+    )
+    result: Result = tx.run(query)
+    try:
+        return [Friendship(members=person.data()['friendship']) for person in result]
+    except ServiceUnavailable as exception:
+        raise exception
 
 
 def _create_friendship(tx, friendship: Friendship):

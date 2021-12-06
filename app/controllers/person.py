@@ -8,15 +8,6 @@ from app.db.driver import Driver
 from app.schemas import Person
 
 
-def get_person(person_name: str) -> Person:
-    with Driver.session() as session:
-        result: Person = session.read_transaction(_find_and_return_person, person_name)
-        if not result:
-            raise HTTPException(status_code=404, detail="Not found")
-
-    return result
-
-
 def get_all_persons() -> List[Person]:
     with Driver.session() as session:
         result: List[Person] = session.read_transaction(_return_all_persons)

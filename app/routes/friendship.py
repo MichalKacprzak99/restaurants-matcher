@@ -8,7 +8,14 @@ from app.schemas import Friendship
 router = APIRouter(prefix='/friendship',
                    tags=["friendship"],
                    )
-# TODO get all friendships
+
+
+@router.get(
+    "/",
+    status_code=HTTP_201_CREATED,
+)
+async def get_all_friendships():
+    return controller.get_friendships()
 
 
 @router.post(

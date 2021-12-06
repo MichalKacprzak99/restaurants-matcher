@@ -8,15 +8,6 @@ from app.db.driver import Driver
 from app.schemas import Restaurant
 
 
-def get_restaurant(restaurant_name: str) -> Restaurant:
-    with Driver.session() as session:
-        result: Restaurant = session.read_transaction(_find_and_return_restaurant, restaurant_name)
-        if not result:
-            raise HTTPException(status_code=404, detail="Not found")
-
-    return result
-
-
 def get_all_restaurants() -> List[Restaurant]:
     with Driver.session() as session:
         result: List[Restaurant] = session.read_transaction(_return_all_restaurants)
@@ -43,27 +34,6 @@ def _delete_restaurant(tx, restaurant_name: str):
         '''
     )
     tx.run(query, restaurant_name=restaurant_name)
-
-
-def _find_and_return_restaurant(tx, restaurant_name: str) -> Restaurant:
-    query = (
-        '''
-        MATCH
-        (restaurant)-[:CUISINE]->(cuisine),
-        (owner:Person)-[:OWNER]->(restaurant)
-        WHERE restaurant.name = $restaurant_name
-        RETURN restaurant, owner, cuisine
-        '''
-    )
-    result: Result = tx.run(query, restaurant_name=restaurant_name)
-    try:
-        restaurant = result.single()
-        if restaurant:
-            restaurant_data: dict = restaurant.data()
-            name = restaurant_data.pop('restaurant').get('name')
-            return Restaurant(name=name, **restaurant_data)
-    except ServiceUnavailable as exception:
-        raise exception
 
 
 def _return_all_restaurants(tx) -> List[Restaurant]:
