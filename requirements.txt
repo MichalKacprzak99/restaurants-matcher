@@ -3,3 +3,4 @@ fastapi-utils
 python-dotenv
 neo4j
 uvicorn
+pydantic
