@@ -53,8 +53,7 @@ def _return_all_restaurants(tx) -> List[Restaurant]:
         restaurants: List[Restaurant] = []
         for restaurant in result:
             restaurant_data: dict = restaurant.data()
-            name = restaurant_data.pop('restaurant').get('name')
-            restaurants.append(Restaurant(name=name, **restaurant_data))
+            restaurants.append(Restaurant(**restaurant_data.pop('restaurant'), **restaurant_data))
 
         return restaurants
     except ServiceUnavailable as exception:
