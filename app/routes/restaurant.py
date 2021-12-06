@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 import app.controllers.restaurant as controller
@@ -34,4 +34,8 @@ async def delete_restaurant(restaurant_name: str):
     controller.delete_restaurant(restaurant_name=restaurant_name)
 
 
-
+@router.post(
+    "/rate",
+)
+async def rate_restaurant(restaurant_name: str, rating: int = Body(..., embed=True)):
+    controller.rate_restaurant(restaurant_name=restaurant_name, rating=rating)

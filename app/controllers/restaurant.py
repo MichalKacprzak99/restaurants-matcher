@@ -1,6 +1,5 @@
 from typing import List
 
-from fastapi import HTTPException
 from neo4j import Result
 from neo4j.exceptions import ServiceUnavailable
 
@@ -23,6 +22,11 @@ def create_restaurant(restaurant: Restaurant) -> Restaurant:
 def delete_restaurant(restaurant_name: str):
     with Driver.session() as session:
         session.write_transaction(_delete_restaurant, restaurant_name)
+
+
+def rate_restaurant(restaurant_name: str, rating: int):
+    with Driver.session() as session:
+        session.write_transaction(_rate_restaurant, restaurant_name, rating)
 
 
 def _delete_restaurant(tx, restaurant_name: str):
@@ -62,15 +66,29 @@ def _create_and_return_restaurant(tx, restaurant: Restaurant) -> Restaurant:
         '''
         MATCH (p:Person {name: $owner_name})
         MATCH (c:Cuisine {name: $cuisine_name})
-        CREATE (r:Restaurant {name:$restaurant_name})
+        CREATE (r:Restaurant {name:$restaurant_name, ratings: $ratings})
         CREATE (p)-[rel1: OWNER_OF]->(r)
         CREATE (r)-[rel2: SERVE_CUISINE]->(c)
         '''
     )
-    tx.run(query, restaurant_name=restaurant.name,
+    tx.run(query,
+           restaurant_name=restaurant.name,
            owner_name=restaurant.owner.name,
-           cuisine_name=restaurant.cuisine.name)
+           cuisine_name=restaurant.cuisine.name,
+           ratings=restaurant.ratings
+           )
     try:
         return restaurant
     except ServiceUnavailable as exception:
         raise exception
+
+
+def _rate_restaurant(tx, restaurant_name: str, rating: int):
+    query = (
+        '''
+        MATCH (r:Restaurant {name: $restaurant_name})
+
+        SET r.ratings =r.ratings + $rating
+        '''
+    )
+    tx.run(query, restaurant_name=restaurant_name, rating=rating)
