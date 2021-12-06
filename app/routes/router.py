@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 
-from app.routes.person import router as person_router
-from app.routes.friendship import router as friendship_router
-from app.routes.cuisine import router as cuisine_router
-from app.routes.restaurant import router as restaurant_router
+from .person import router as person_router
+from .friendship import router as friendship_router
+from .cuisine import router as cuisine_router
+from .restaurant import router as restaurant_router
 
 router = APIRouter()
 
