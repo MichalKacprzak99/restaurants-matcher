@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi_utils.api_model import APIModel
 
@@ -10,4 +10,6 @@ class Restaurant(APIModel):
     name: str
     owner: Person
     cuisine: Cuisine
+    city: str
+    country: str
     ratings: List[int] = []
