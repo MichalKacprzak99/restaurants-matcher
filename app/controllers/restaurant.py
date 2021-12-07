@@ -60,7 +60,7 @@ def match_restaurant(first_person_name: str, second_person_name: str) -> Optiona
                friends_weight * (statistics.mean(d['restaurant'].ratings) if d['restaurant'].ratings else 0)
 
     sorted_restaurants = sorted(restaurant_average_travel_distances, key=lambda d: sort_by(d), reverse=True)
-    return sorted_restaurants[0]
+    return sorted_restaurants[0].get('restaurant')
 
 
 def _delete_restaurant(tx, restaurant_name: str):
