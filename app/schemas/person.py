@@ -5,3 +5,4 @@ class Person(APIModel):
     name: str
     phone: str
     city: str
+    country: str
