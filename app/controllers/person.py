@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import HTTPException
+from geopy import Nominatim
 from neo4j import Result
 from neo4j.exceptions import ServiceUnavailable
 
@@ -74,12 +74,19 @@ def _return_all_persons(tx) -> List[Person]:
 
 
 def _create_and_return_person(tx, person: Person) -> Person:
+    geolocator = Nominatim(user_agent="Restaurant Matcher")
+    location = geolocator.geocode(f'{person.city}, {person.country}')
     query = (
         '''
-        CREATE (p:Person {name:$name, city:$city, phone:$phone})
+        CREATE (p:Person {name:$name, city:$city, country:$country, phone:$phone, 
+        latitude:$latitude, longitude: $longitude})
         '''
     )
-    tx.run(query, **person.dict())
+    tx.run(query,
+           **person.dict(),
+           latitude=location.latitude,
+           longitude=location.longitude,
+           )
     try:
         return person
     except ServiceUnavailable as exception:
