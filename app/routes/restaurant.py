@@ -1,14 +1,15 @@
-from typing import List
+from typing import Dict, List, Optional
 
 from fastapi import APIRouter, Body
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 import app.controllers.restaurant as controller
-from app.schemas import Restaurant
+from app.schemas import Person, Restaurant
 
 router = APIRouter(prefix='/restaurant',
                    tags=['restaurant'],
                    )
+
 
 @router.get(
     "/",
@@ -39,3 +40,12 @@ async def delete_restaurant(restaurant_name: str):
 )
 async def rate_restaurant(restaurant_name: str, rating: int = Body(..., embed=True)):
     controller.rate_restaurant(restaurant_name=restaurant_name, rating=rating)
+
+
+@router.get(
+    "/match",
+)
+async def match_restaurant(first_person_name: str,
+                           second_person_name: str) -> Optional[Restaurant]:
+    return controller.match_restaurant(first_person_name=first_person_name,
+                                       second_person_name=second_person_name)
