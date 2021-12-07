@@ -15,7 +15,7 @@ def get_friendships():
     return result
 
 
-def check_friendships(person_name: str, friend_name: str):
+def check_friendship(person_name: str, friend_name: str):
     with Driver.session() as session:
         is_friend: bool = session.read_transaction(_check_friendships, person_name, friend_name)
     return is_friend
