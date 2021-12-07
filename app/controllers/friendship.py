@@ -17,7 +17,7 @@ def get_friendships():
 
 def check_friendship(person_name: str, friend_name: str):
     with Driver.session() as session:
-        is_friend: bool = session.read_transaction(_check_friendships, person_name, friend_name)
+        is_friend: bool = session.read_transaction(_check_friendship, person_name, friend_name)
     return is_friend
 
 
@@ -61,18 +61,19 @@ def _create_friendship(tx, friendship: Friendship):
     tx.run(query, person_name=friendship.members[0], friend_name=friendship.members[1])
 
 
-def _check_friendships(tx, person_name: str, friend_name: str) -> bool:
+def _check_friendship(tx, person_name: str, friend_name: str) -> bool:
     query = (
         '''
-        MATCH (p1:Person {name: $person_name})
-        MATCH (p2:Person {name: $friend_name})
-        RETURN EXISTS( (p1)-[:FRIEND_WITH]-(p2) )
+        MATCH (p1:Person {name: 'Michał Kacprzak'})
+        MATCH (p2:Person {name: 'Kacper Staroń'})
+        WITH { areFriends: EXISTS( (p1)-[:FRIEND_WITH]-(p2) ) } AS areFriends
+        RETURN areFriends
         '''
     )
 
     result: Result = tx.run(query, person_name=person_name, friend_name=friend_name)
     try:
-        return result.data()[0].get('are_friends')
+        return result.data()[0].get('areFriends').get('areFriends')
     except ServiceUnavailable as exception:
         raise exception
 
