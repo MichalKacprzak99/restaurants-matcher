@@ -15,7 +15,7 @@ app.add_middleware(
     allow_origins=configuration.ALLOWED_HOSTS,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*", "Access-Control-Allow-Origin"],
 )
 
 
