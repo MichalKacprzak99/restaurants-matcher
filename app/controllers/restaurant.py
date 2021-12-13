@@ -36,8 +36,8 @@ def rate_restaurant(restaurant_name: str, rating: int):
 def match_restaurant(first_person_name: str, second_person_name: str) -> Optional[Restaurant]:
     are_friends = friendship_controller.check_friendship(first_person_name, second_person_name)
     distance_weight: float = (2 - int(are_friends)) / 2
-    first_person_friends = person_controller.get_person_friends(first_person_name)
-    second_person_friends = person_controller.get_person_friends(second_person_name)
+    first_person_friends = [person.name for person in person_controller.get_person_friends(first_person_name)]
+    second_person_friends = [person.name for person in person_controller.get_person_friends(second_person_name)]
     common_friends = list(set(first_person_friends) & set(second_person_friends))
 
     try:
